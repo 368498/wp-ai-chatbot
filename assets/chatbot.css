@@ -1,24 +1,138 @@
-#wpai-chatbot-box {
-    max-width: 400px;
-    margin: 0 auto;
+/* WordPress AI Chatbot - Base Styles */
+.wpai-chatbot-box {
     border: 1px solid #ddd;
     border-radius: 8px;
     background: #fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     font-family: inherit;
     display: flex;
     flex-direction: column;
-    height: 500px;
+    margin: 20px 0;
 }
-#wpai-chatbot-messages {
+
+.wpai-chatbot-floating {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 380px;
+    max-width: calc(100vw - 40px);
+    height: 500px;
+    z-index: 999999;
+    transform: translateY(calc(100% + 20px));
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wpai-chatbot-floating.wpai-chatbot-open {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+.wpai-chatbot-inline {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    height: 400px;
+    margin: 20px auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Responsive inline chat */
+@media (max-width: 768px) {
+    .wpai-chatbot-inline {
+        height: 300px;
+        margin: 10px 0;
+    }
+}
+
+/* Chat Toggle Button */
+.wpai-chatbot-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #0073aa;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,115,170,0.3);
+    z-index: 1000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Ensure button is clickable */
+    pointer-events: auto;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.wpai-chatbot-toggle:hover {
+    background: #005a87;
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0,115,170,0.4);
+}
+
+.wpai-chatbot-toggle:active {
+    transform: scale(0.95);
+}
+
+.wpai-chatbot-toggle.wpai-chatbot-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Chat Header */
+.wpai-chatbot-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #e1e1e1;
+    background: #f8f9fa;
+    border-radius: 8px 8px 0 0;
+}
+
+.wpai-chatbot-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1d2327;
+    margin: 0;
+}
+
+.wpai-chatbot-close {
+    background: none;
+    border: none;
+    color: #646970;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.wpai-chatbot-close:hover {
+    background: #e1e1e1;
+    color: #1d2327;
+}
+.wpai-chatbot-messages {
     flex: 1;
     overflow-y: auto;
     padding: 16px;
     background: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 .wpai-chatbot-user {
     text-align: right;
-    margin-bottom: 10px;
+    align-self: flex-end;
 }
 .wpai-chatbot-user {
     color: #2b7cff;
@@ -30,7 +144,7 @@
 }
 .wpai-chatbot-bot {
     text-align: left;
-    margin-bottom: 10px;
+    align-self: flex-start;
 }
 .wpai-chatbot-bot {
     color: #222;
@@ -40,13 +154,13 @@
     border-radius: 16px 16px 16px 0;
     max-width: 80%;
 }
-#wpai-chatbot-form {
+.wpai-chatbot-form {
     display: flex;
     padding: 12px;
     border-top: 1px solid #eee;
     background: #fafbfc;
 }
-#wpai-chatbot-input {
+.wpai-chatbot-input {
     flex: 1;
     padding: 8px 12px;
     border: 1px solid #ccc;
@@ -54,7 +168,7 @@
     font-size: 16px;
     outline: none;
 }
-#wpai-chatbot-send {
+.wpai-chatbot-send {
     margin-left: 8px;
     padding: 8px 18px;
     border: none;
@@ -65,27 +179,114 @@
     cursor: pointer;
     transition: background 0.2s;
 }
-#wpai-chatbot-send:disabled {
+.wpai-chatbot-send:disabled {
     background: #b3d1ff;
     cursor: not-allowed;
 }
-#wpai-chatbot-loading {
+.wpai-chatbot-loading {
     display: none;
     margin-left: 10px;
     color: #888;
     font-size: 14px;
     align-self: center;
 }
-#wpai-chatbot-error {
+.wpai-chatbot-error {
     display: none;
     color: #d32f2f;
     padding: 8px 16px;
     font-size: 14px;
     text-align: center;
 }
-@media (max-width: 500px) {
-    #wpai-chatbot-box {
-        max-width: 100%;
-        height: 400px;
+/* Mobile Responsive Design - WordPress Patterns */
+@media (max-width: 768px) {
+    .wpai-chatbot-floating {
+        width: calc(100vw - 20px);
+        max-width: none;
+        height: 70vh;
+        max-height: 500px;
+        bottom: 10px;
+        right: 10px;
+        left: 10px;
     }
+    
+    .wpai-chatbot-toggle {
+        bottom: 10px;
+        right: 10px;
+        width: 56px;
+        height: 56px;
+        font-size: 22px;
+    }
+}
+
+@media (max-width: 480px) {
+    .wpai-chatbot-floating {
+        height: 60vh;
+        max-height: 400px;
+    }
+    
+    .wpai-chatbot-header {
+        padding: 12px 16px;
+    }
+    
+    .wpai-chatbot-title {
+        font-size: 14px;
+    }
+    
+    .wpai-chatbot-messages {
+        padding: 12px;
+    }
+    
+    .wpai-chatbot-form {
+        padding: 8px;
+    }
+}
+
+/* Left-side positioning option */
+.wpai-chatbot-floating.wpai-chatbot-left {
+    right: auto;
+    left: 20px;
+}
+
+.wpai-chatbot-toggle.wpai-chatbot-left {
+    right: auto;
+    left: 20px;
+}
+
+@media (max-width: 768px) {
+    .wpai-chatbot-floating.wpai-chatbot-left {
+        left: 10px;
+        right: 10px;
+    }
+    
+    .wpai-chatbot-toggle.wpai-chatbot-left {
+        left: 10px;
+    }
+}
+
+/* WordPress-style focus states for accessibility */
+.wpai-chatbot-toggle:focus,
+.wpai-chatbot-close:focus,
+.wpai-chatbot-send:focus,
+.wpai-chatbot-input:focus {
+    outline: 2px solid #0073aa;
+    outline-offset: 2px;
+}
+
+/* WordPress-style loading animation */
+.wpai-chatbot-loading:before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #e1e1e1;
+    border-top: 2px solid #0073aa;
+    border-radius: 50%;
+    animation: wpai-spin 1s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+@keyframes wpai-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 } 

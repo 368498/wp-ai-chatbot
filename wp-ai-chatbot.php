@@ -21,8 +21,23 @@ function wpai_chatbot_activate() {
     }
 }
 
-function wpai_chatbot_shortcode() {
+function wpai_chatbot_shortcode($atts) {
+    $atts = shortcode_atts(array(
+        'type' => 'inline',
+        'title' => 'AI Assistant',
+        'height' => '400px',
+        'width' => '100%'
+    ), $atts);
+    
     ob_start();
+    
+    //global variables for template
+    global $wpai_chatbot_type, $wpai_chatbot_title, $wpai_chatbot_height, $wpai_chatbot_width;
+    $wpai_chatbot_type = sanitize_text_field($atts['type']);
+    $wpai_chatbot_title = sanitize_text_field($atts['title']);
+    $wpai_chatbot_height = sanitize_text_field($atts['height']);
+    $wpai_chatbot_width = sanitize_text_field($atts['width']);
+    
     include plugin_dir_path(__FILE__) . 'templates/chatbox.php';
     return ob_get_clean();
 }
