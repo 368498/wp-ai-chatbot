@@ -55,4 +55,24 @@ add_action('wp_enqueue_scripts', 'wpai_chatbot_enqueue_assets');
 
 // AJAX Handlers
 add_action('wp_ajax_wpai_chatbot_ask', 'wpai_chatbot_handle_ajax');
-add_action('wp_ajax_nopriv_wpai_chatbot_ask', 'wpai_chatbot_handle_ajax'); 
+add_action('wp_ajax_nopriv_wpai_chatbot_ask', 'wpai_chatbot_handle_ajax');
+
+// Auto-indexing hooks
+add_action('publish_post', 'wpai_auto_index_post');
+add_action('publish_page', 'wpai_auto_index_post');
+add_action('wp_insert_post', 'wpai_auto_index_post');
+
+function wpai_auto_index_post($post_id) {
+    $auto_index = get_option('wpai_auto_index', 0);
+    if (!$auto_index) return;
+    
+    $post = get_post($post_id);
+    if (!$post) return;
+    
+    $selected_types = get_option('wpai_post_types', array('post'));
+    if (!in_array($post->post_type, $selected_types)) return;
+    
+    if ($post->post_status !== 'publish') return;
+    
+    wpai_index_post_content($post_id);
+} 

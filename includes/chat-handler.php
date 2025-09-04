@@ -32,7 +32,10 @@ function wpai_chatbot_handle_ajax() {
 
     // Sort by score descending
     usort($scored, function($a, $b) { return $b['score'] <=> $a['score']; });
-    $top_scorers = array_slice($scored, 0, 5);
+    
+    //configurable context limit
+    $context_limit = intval(get_option('wpai_context_limit', 5));
+    $top_scorers = array_slice($scored, 0, $context_limit);
     $context = implode("\n\n", array_column($top_scorers, 'chunk'));
 
     // Call OpenAI 

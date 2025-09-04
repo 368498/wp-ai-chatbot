@@ -41,18 +41,77 @@ function wpai_openai_api_request($endpoint, $body, $api_key, $max_attempts = 5) 
 }
 
 
-// Fetch and chunk post content
-function wpai_get_content_chunks($post_id, $chunk_size = 400) {
+// Fetch and chunk post content 
+function wpai_get_content_chunks($post_id, $chunk_size = null) {
+    if ($chunk_size === null) {
+        $chunk_size = intval(get_option('wpai_chunk_size', 400));
+    }
+    
     $post = get_post($post_id);
     if (!$post) return array();
+    
+    $content_parts = array();
+    
+    $content_parts[] = "Title: " . $post->post_title;
+    
+    $include_excerpts = get_option('wpai_include_excerpts', 0);
+    if ($include_excerpts && !empty($post->post_excerpt)) {
+        $content_parts[] = "Excerpt: " . $post->post_excerpt;
+    }
+    
+    // Add main content
     $content = strip_tags($post->post_content);
-    $words = preg_split('/\s+/', $content);
+    if (!empty($content)) {
+        $content_parts[] = "Content: " . $content;
+    }
+    
+    $include_meta = get_option('wpai_include_meta', 0);
+    if ($include_meta) {
+        $meta_data = wpai_get_post_meta_data($post_id);
+        if (!empty($meta_data)) {
+            $content_parts[] = "Additional Information: " . $meta_data;
+        }
+    }
+    
+    $full_content = implode("\n\n", $content_parts);
+    
+    //Split into chunks
+    $words = preg_split('/\s+/', $full_content);
     $chunks = array();
     for ($i = 0; $i < count($words); $i += $chunk_size) {
         $chunk = array_slice($words, $i, $chunk_size);
         $chunks[] = implode(' ', $chunk);
     }
+    
     return $chunks;
+}
+
+function wpai_get_post_meta_data($post_id) {
+    $meta_data = array();
+    
+    $custom_fields = get_post_custom($post_id);
+    foreach ($custom_fields as $key => $values) {
+        if (strpos($key, '_') === 0) continue;
+        
+        $value = is_array($values) ? implode(', ', $values) : $values;
+        if (!empty($value)) {
+            $meta_data[] = $key . ': ' . $value;
+        }
+    }
+    
+    $categories = get_the_category($post_id);
+    if (!empty($categories)) {
+        $cat_names = array_map(function($cat) { return $cat->name; }, $categories);
+        $meta_data[] = 'Categories: ' . implode(', ', $cat_names);
+    }
+    
+    $tags = get_the_tags($post_id);
+    if (!empty($tags)) {
+        $tag_names = array_map(function($tag) { return $tag->name; }, $tags);
+        $meta_data[] = 'Tags: ' . implode(', ', $tag_names);
+    }
+    
+    return implode('; ', $meta_data);
 }
 
 // call OpenAI embedding API for a text chunk

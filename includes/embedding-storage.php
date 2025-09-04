@@ -63,3 +63,33 @@ function wpai_delete_embeddings_by_post($post_id) {
 
     return $wpdb->delete($table_name, array('post_id' => $post_id), array('%d'));
 }
+
+// total count  embeddings
+function wpai_get_embedding_count() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'ai_embeddings';
+    return $wpdb->get_var("SELECT COUNT(*) FROM $table_name");
+}
+
+function wpai_clear_all_embeddings() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'ai_embeddings';
+    return $wpdb->query("TRUNCATE TABLE $table_name");
+}
+
+function wpai_test_openai_connection($api_key) {
+    $endpoint = 'https://api.openai.com/v1/models';
+    $response = wp_remote_get($endpoint, array(
+        'headers' => array(
+            'Authorization' => 'Bearer ' . $api_key,
+        ),
+        'timeout' => 10,
+    ));
+    
+    if (is_wp_error($response)) {
+        return false;
+    }
+    
+    $code = wp_remote_retrieve_response_code($response);
+    return $code === 200;
+}
